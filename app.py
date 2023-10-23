@@ -1,3 +1,4 @@
+import numpy as np
 import streamlit as st
 from dotenv import load_dotenv
 from PyPDF2 import PdfReader
@@ -5,43 +6,75 @@ import os
 import pickle
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.embeddings import OpenAIEmbeddings
-from langchain.vectorstores import FAISS
+from langchain.vectorstores import faiss
+from langchain.vectorstores.base import VectorStore
 from langchain.chat_models import ChatOpenAI
 from langchain.memory import ConversationBufferMemory
 from langchain.chains import ConversationalRetrievalChain
+
 from streamlit_extras.add_vertical_space import add_vertical_space
 
 def get_pdf_text(pdf_docs):
-    text = ''
     title = []
+    text_docs = []
     for pdf in pdf_docs:
         #st.write(pdf)
-        title.append(pdf.name)
+        title.append(pdf.name[:-4])
         #st.write(pdf.name)
         pdf_reader = PdfReader(pdf)
+        text = ''
         for page in pdf_reader.pages:
             text += page.extract_text()
-    return title,text
+        text_docs.append(text)
+    #st.write(text_docs,title)
+    return title,text_docs
 
-def get_text_chunks(text):
+def get_text_chunks(texts):
     text_splitter = RecursiveCharacterTextSplitter(
         chunk_size=1000,
         chunk_overlap=200,
         length_function=len
     )
-    chunks = text_splitter.split_text(text)
+    chunks = []
+    for text in texts:
+        chunks.append(text_splitter.split_text(text))
+    # for i in range(len(chunks)):
+    #     st.write(chunks[i])
     return chunks
 
-def get_vectorstore(title,text_chunks):
+def get_vectorstore(titles,text_chunks):
+    it_titles = iter(titles)
+    title = next(it_titles)
     if os.path.exists(f'{title}.pkl'):
         with open(f'{title}.pkl','rb') as f:
             vectorstore = pickle.load(f)
-        st.write("Embeddings loaded!")
+            st.write(vectorstore,type(vectorstore))
+        st.write(f"Embeddings {title} loaded!")
     else:
+        index = titles.index(title)
         embeddings = OpenAIEmbeddings()
-        vectorstore = FAISS.from_texts(texts=text_chunks,embedding=embeddings)
+        vectorstore = faiss.FAISS.from_texts(texts=text_chunks[index],embedding=embeddings)
+        st.write(f"Embeddings {title} loaded!")
         with open(f'{title}.pkl','wb') as f:
-            pickle.dump(vectorstore,f)
+            pickle.dump(dv,f)
+    
+    for title in it_titles:
+        #dv = pd.Dataframe()
+        if os.path.exists(f'{title}.pkl'):
+            with open(f'{title}.pkl','rb') as f:
+                dv = pickle.load(f)
+                st.write(dv,type(dv))
+            st.write(f"Embeddings {title} loaded!")
+        else:
+            index = titles.index(title)
+            embeddings = OpenAIEmbeddings()
+            dv = faiss.FAISS.from_texts(texts=text_chunks[index],embedding=embeddings)
+            st.write(f"Embeddings {title} loaded!")
+            with open(f'{title}.pkl','wb') as f:
+                pickle.dump(dv,f)
+        vectorstore.merge_from(dv)
+        st.write(f"Embeddings {title} merged!")
+
     return vectorstore
 
 def get_conversation_chain(vectorstore):
@@ -71,11 +104,13 @@ def main():
             #st.write(pdf_docs[0].name)
             with st.spinner('Processing'):
                 #get the pdf text
-                title,raw_text = get_pdf_text(pdf_docs)
+                title,text_docs = get_pdf_text(pdf_docs)
              
                 #divide the pdf text into text chunks
-                text_chunks = get_text_chunks(raw_text)
+                text_chunks = get_text_chunks(text_docs)
                 st.write(text_chunks)
+
+                #st.write(pdf_docs[::-4].name)
 
                 #create vector  store
                 #can combine 2 vectorstores into one
