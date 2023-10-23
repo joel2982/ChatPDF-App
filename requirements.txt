@@ -5,4 +5,5 @@ streamlit==1.18.1
 faiss-cpu==1.7.4
 altair==4.1.0
 OpenAI==0.28.1
+tiktoken
 streamlit-extras
