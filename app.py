@@ -12,6 +12,7 @@ from langchain.chat_models import ChatOpenAI
 from langchain.memory import ConversationBufferMemory
 from langchain.chains import ConversationalRetrievalChain
 from chatui import css,user_template,bot_template
+import tiktoken
 from streamlit_extras.add_vertical_space import add_vertical_space
 
 OPENAI_API_KEY=st.secrets['OPENAI_API_KEY']
