@@ -45,8 +45,8 @@ def get_text_chunks(texts):
 def get_vectorstore(titles,text_chunks):
     it_titles = iter(titles)
     title = next(it_titles)
-    if os.path.exists(f'\embeddings\{title}.pkl'):
-        with open(f'\embeddings\{title}.pkl','rb') as f:
+    if os.path.exists(f'embeddings\{title}.pkl'):
+        with open(f'embeddings\{title}.pkl','rb') as f:
             vectorstore = pickle.load(f)
         #     st.write(vectorstore,type(vectorstore))
         # st.write(f"Embeddings {title} loaded!")
@@ -55,7 +55,7 @@ def get_vectorstore(titles,text_chunks):
         embeddings = OpenAIEmbeddings()
         vectorstore = faiss.FAISS.from_texts(texts=text_chunks[index],embedding=embeddings)
         # st.write(f"Embeddings {title} loaded!")
-        with open(f'\embeddings\{title}.pkl','wb') as f:
+        with open(f'embeddings\{title}.pkl','wb') as f:
             pickle.dump(vectorstore,f)
     
     for title in it_titles:
@@ -70,7 +70,7 @@ def get_vectorstore(titles,text_chunks):
             embeddings = OpenAIEmbeddings()
             dv = faiss.FAISS.from_texts(texts=text_chunks[index],embedding=embeddings)
             # st.write(f"Embeddings {title} loaded!")
-            with open(f'\embeddings\{title}.pkl','wb') as f:
+            with open(f'embeddings\{title}.pkl','wb') as f:
                 pickle.dump(dv,f)
         vectorstore.merge_from(dv)
         # st.write(f"Embeddings {title} merged!")
