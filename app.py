@@ -14,7 +14,7 @@ from langchain.chains import ConversationalRetrievalChain
 from chatui import css,user_template,bot_template
 from streamlit_extras.add_vertical_space import add_vertical_space
 
-open_api_key=st.secrets['OPEN_API_KEY']
+OPENAI_API_KEY=st.secrets['OPENAI_API_KEY']
 
 def get_pdf_text(pdf_docs):
     title = []
