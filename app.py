@@ -14,7 +14,7 @@ from langchain.chains import ConversationalRetrievalChain
 from chatui import css,user_template,bot_template
 from streamlit_extras.add_vertical_space import add_vertical_space
 
-#OPENAI_API_KEY=st.secrets['OPENAI_API_KEY']
+OPENAI_API_KEY=st.secrets['OPENAI_API_KEY']
 
 def new_session_state():
     st.write(bot_template.replace("{{MSG}}","How can I help you!"), unsafe_allow_html=True)
