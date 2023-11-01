@@ -4,7 +4,6 @@ from dotenv import load_dotenv
 from PyPDF2 import PdfReader
 import os
 import pickle
-import openai
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.embeddings import OpenAIEmbeddings
 from langchain.vectorstores import faiss
@@ -80,7 +79,7 @@ def get_vectorstore(titles,text_chunks):
 def conversation_chain(user_question):
         if not st.session_state.conversation:
             llm = ChatOpenAI(model_name='gpt-3.5-turbo')
-            st.session_state.chain = load_qa_chain(llm,chain_type='map_reduce')
+            st.session_state.chain = load_qa_chain(llm,chain_type='stuff')
             memory = ConversationBufferMemory(memory_key='chat_history', return_messages=True)
             conversation_chain = ConversationalRetrievalChain.from_llm(
                 llm = llm,
