@@ -14,11 +14,10 @@ from langchain.chains import ConversationalRetrievalChain
 from chatui import css,user_template,bot_template
 from streamlit_extras.add_vertical_space import add_vertical_space
 
-OPENAI_API_KEY=st.secrets['OPENAI_API_KEY']
+#OPENAI_API_KEY=st.secrets['OPENAI_API_KEY']
 
 def new_session_state():
     st.write(bot_template.replace("{{MSG}}","How can I help you!"), unsafe_allow_html=True)
-
     st.session_state.conversation = None
     st.session_state.chat_history = None
     st.session_state.chain = None
@@ -78,7 +77,7 @@ def get_vectorstore(titles,text_chunks):
 
 def conversation_chain(user_question):
         if not st.session_state.conversation:
-            llm = ChatOpenAI(model_name='gpt-3.5-turbo')
+            llm = ChatOpenAI(model_name='gpt-3.5-turbo-16k')
             st.session_state.chain = load_qa_chain(llm,chain_type='stuff')
             memory = ConversationBufferMemory(memory_key='chat_history', return_messages=True)
             conversation_chain = ConversationalRetrievalChain.from_llm(
@@ -98,9 +97,6 @@ def conversation_chain(user_question):
                 st.write(user_template.replace("{{MSG}}",chat.content), unsafe_allow_html=True)
             else:
                 st.write(bot_template.replace("{{MSG}}",chat.content), unsafe_allow_html=True)
-
-
-
 
 def main():
     load_dotenv()
